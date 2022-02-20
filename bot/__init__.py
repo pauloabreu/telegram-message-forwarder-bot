@@ -18,13 +18,13 @@ if os.path.exists('config.env'):
 
 chats_data = {}
 
-LOG.info("Welcome, this is the telegram-message-forwarder-bot. initializing...")
+#print("Welcome, this is the telegram-message-forwarder-bot. initializing...")
 
 try:
   api_id = int(environ["API_ID"])
   api_hash = environ["API_HASH"]
   bot_token = environ.get("BOT_TOKEN", None)
-  tg_session = environ.get("TELEGRAM_SESSION", None)
+  tg_session = environ.get("SESSION", None)
   sudo_users = list(set(x for x in environ.get("SUDO_USERS", "999197022").split(";")))
   try:
     from_chats = list(set(int(x) for x in environ.get("FROM_CHATS").split()))
@@ -51,18 +51,37 @@ except:
   remove_strings = None
 
 if tg_session:
-  LOG.info("Session Mode - {tg_session}")
+  print("Session Mode - {tg_session}")
   app = Client(tg_session, api_id, api_hash)
 elif bot_token:
-  LOG.info("Bot Mode")
+  print("Bot Mode")
   app = Client(":memory:", api_id, api_hash, bot_token=bot_token)
 else:
   LOG.error("Set either TELEGRAM_SESSION or BOT_TOKEN variable.")
   sys.exit(1)
 
 with app:
+
+  """
+  test = app.get_chat(-1001624797365)
+  print(test['id'] == -1001624797365)
+
+  test = app.get_dialogs()
+  for item in test:
+    #if "ORD" in item['chat']['title']:
+    phishing = {
+      "chat": item['chat']['title'],
+      "id": item['chat']['id'],
+      #"text": message['text']
+    }
+    #if phishing["id"] == "-1001615847555" or phishing["id"] == "-1001707440698":
+    if str(item['chat']['title']).find("zord") != -1:
+      item['chat']['photo'] = None
+      print(item['chat'])
+  """
+
   sudo_users = get_formatted_chats(sudo_users, app)
-  LOG.info(f"Sudo users - {sudo_users}")
+  print(f"Sudo users - {sudo_users}")
   if advance_config:
     for chats in advance_config.split(";"):
       chat = chats.strip().split()
@@ -77,14 +96,14 @@ with app:
         chats_data[f] = chat
       if not f in from_chats:
         from_chats.append(f)
-    LOG.info(f"From Chats: {from_chats}")
-    LOG.info(f"Advanced Config: {chats_data}")
+    print(f"From Chats: {from_chats}")
+    print(f"Advanced Config: {chats_data}")
   else:
     if len(to_chats) == 0 or len(from_chats) == 0:
-      LOG.error("Set either ADVANCE_CONFIG or FROM_CHATS and TO_CHATS")
+      #LOG.error("Set either ADVANCE_CONFIG or FROM_CHATS and TO_CHATS")
       sys.exit(1)
     else:
       from_chats = get_formatted_chats(from_chats, app)
       to_chats = get_formatted_chats(to_chats, app)
-      LOG.info(f"From Chats: {from_chats}")
-      LOG.info(f"To Chats: {to_chats}")
+      print(f"From Chats: {from_chats}")
+      print(f"To Chats: {to_chats}")

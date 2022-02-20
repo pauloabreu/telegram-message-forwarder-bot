@@ -6,7 +6,7 @@ from bot import LOG, app, advance_config, chats_data, from_chats, to_chats, \
                 remove_strings, replace_string, sudo_users
 from bot.helper.utils import get_formatted_chat
 
-LOG.info("Welcome, this is the telegram-message-forwarder-bot. main routine...")
+#print("Welcome, this is the telegram-message-forwarder-bot. main routine...")
 
 @app.on_message(filters.chat(from_chats) & filters.incoming)
 def work(client, message):
@@ -43,6 +43,7 @@ def work(client, message):
 
 @app.on_message(filters.user(sudo_users) & filters.command(["fwd", "forward"]), group=1)
 def forward(app, message):
+    LOG.error(message)
     if len(message.command) > 1:
       chat_id = get_formatted_chat(message.command[1], app)
       if chat_id:
